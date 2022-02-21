@@ -81,3 +81,17 @@ module PhylogeneticTree =
         let mutable branchCount = 0
         tree |> iter (fun _ -> branchCount <- branchCount+1) (fun _ -> ()) 
         branchCount
+
+    ///Returns the most top level element for which the condition returns true
+    let rec tryGetNodeBy (condition: PhylogeneticTree<'T> -> bool) (tree:PhylogeneticTree<'n>) =
+        let rec loopList nl =
+            match nl with
+            | n :: tail -> 
+                match tryGetNodeBy condition n with
+                | Some x -> Some x
+                | None -> loopList tail
+            | [] -> None
+        match tree with
+        | Branch _ when condition tree ->
+            Some tree
+        | Branch (_,nl) -> loopList nl     
